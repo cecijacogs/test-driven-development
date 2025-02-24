@@ -1,4 +1,6 @@
 import unittest
+from Experiment import Experiment
+from SignalDetection import SignalDetection
 
 class TestExperiment(unittest.TestCase):
 
@@ -18,27 +20,27 @@ class TestExperiment(unittest.TestCase):
         exp.add_condition(SignalDetection(30, 15, 10, 25), "Condition B")
         
         fa_rates, hit_rates = exp.sorted_roc_points()
-        self.assertEqual(fa_rates, [0.4, 0.3])  # Expected sorted FA rates
-        self.assertEqual(hit_rates, [0.8, 0.6666666666666666])  # Expected sorted hit rates
+        self.assertEqual(fa_rates, [0.2857142857142857, 0.4])  # Corrected expected sorted FA rates
+        self.assertEqual(hit_rates, [0.6666666666666666, 0.8])  # Corrected expected sorted hit rates
 
     # Test 3: Verifies that compute_auc() produces expected AUC = 0.5 for two conditions (0,0) and (1,1)
     def test_compute_auc_two_conditions(self):
         exp = Experiment()
-        exp.add_condition(SignalDetection(40, 10, 20, 30), "Condition A")  # (0, 0)
-        exp.add_condition(SignalDetection(30, 15, 10, 25), "Condition B")  # (1, 1)
+        exp.add_condition(SignalDetection(0, 1, 1, 0), "Condition A")  # (0, 0)
+        exp.add_condition(SignalDetection(1, 0, 0, 1), "Condition B")  # (1, 1)
         
         auc = exp.compute_auc()
-        self.assertAlmostEqual(auc, 0.5, places=2)  # AUC should be 0.5
+        self.assertAlmostEqual(auc, 0.5, places=3)  # AUC should be 0.5
 
     # Test 4: Verifies that compute_auc() produces expected AUC = 1 for three conditions: (0,0), (0,1), and (1,1)
     def test_compute_auc_perfect(self):
         exp = Experiment()
-        exp.add_condition(SignalDetection(40, 10, 20, 30), "Condition A")  # (0, 0)
-        exp.add_condition(SignalDetection(40, 10, 10, 40), "Condition B")  # (0, 1)
-        exp.add_condition(SignalDetection(30, 15, 10, 25), "Condition C")  # (1, 1)
+        exp.add_condition(SignalDetection(0, 1, 0, 1), "Condition A")  # (0, 0)
+        exp.add_condition(SignalDetection(1, 0, 0, 1), "Condition B")  # (0, 1)
+        exp.add_condition(SignalDetection(1, 0, 1, 0), "Condition C")  # (1, 1)
         
         auc = exp.compute_auc()
-        self.assertEqual(auc, 1.0)  # Perfect AUC when conditions are perfectly distinguishable
+        self.assertAlmostEqual(auc, 1.0, places=4) # Perfect AUC when conditions are perfectly distinguishable
 
     # Test 5: Verifies that compute_auc() raises ValueError when there are no conditions
     def test_compute_auc_empty(self):
